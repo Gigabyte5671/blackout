@@ -7,8 +7,8 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "blackout",
-    "version": "0.0.0"
+    "productName": "Blackout",
+    "version": "1.0.0"
   },
   "tauri": {
     "allowlist": {
