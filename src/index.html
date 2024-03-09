@@ -7,17 +7,85 @@
     <title>Blackout</title>
     <style>
       html {
+        height: 100%;
+        color: black;
         background-color: black;
       }
       body {
         all: unset;
-        width: 100vh;
-        height: 100vh;
-        background-color: black;
+        display: block;
+        height: 100%;
+        color: inherit;
+        font-family: system-ui, sans-serif;
+        font-size: small;
+        font-weight: 400;
+        background-color: inherit;
+        overflow: hidden;
+        user-select: none;
+      }
+      span.prompt {
+        margin: 0.5ch;
+        opacity: 0;
+        filter: grayscale(1) invert(1) contrast(1000);
+        transition: 0.1s ease opacity;
+        pointer-events: none;
+      }
+      body:hover span.prompt {
+        opacity: 1;
+      }
+      input[type="color"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        block-size: 0px;
+        inline-size: 0px;
+        opacity: 0;
+        pointer-events: none;
       }
     </style>
+    <script>
+      const storageKey = 'blackoutColor';
+
+      window.addEventListener('load', () => {
+        const root = document.querySelector('html');
+        const input = document.querySelector('input[type="color"]');
+
+        // Load the last selected color.
+        const color = window.localStorage.getItem(storageKey);
+        if (color) {
+          changeColor(color);
+          input.value = color;
+        }
+
+        // Open the color picker on right-click.
+        document.addEventListener('contextmenu', (event) => {
+          event.preventDefault();
+          input.setAttribute('type', 'text');
+          input.setAttribute('type', 'color');
+          input.style.top = event.clientY + 'px';
+          input.style.left = event.clientX + 'px';
+          window.setTimeout(input.click.bind(input), 5);
+        });
+      });
+
+      function changeColor (color) {
+        const root = document.querySelector('html');
+        root.style.color = color;
+        root.style.backgroundColor = color;
+      }
+
+      function saveColor (color) {
+        window.localStorage.setItem(storageKey, color);
+      }
+    </script>
   </head>
 
   <body>
+    <span class="prompt"><i>Right-click to change colour.</i></span>
+    <input
+      type="color"
+      oninput="changeColor(event.target.value)"
+      onchange="saveColor(event.target.value)"
+    >
   </body>
 </html>
