@@ -1,6 +1,8 @@
 # Blackout
-A blank, dark window you can place anywhere to help you focus on other tasks.
+A blank window you can place anywhere to help you focus on other tasks.
+
+You can right click to change the colour of the window.
 
 ![Preview](./preview.png)
 
-Or you can open a [blank, dark tab in your browser](https://gigabyte5671.github.io/blackout/).
+You can also open a [blank tab in your browser](https://blackout.zakweb.dev/).
