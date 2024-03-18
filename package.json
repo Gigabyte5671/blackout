@@ -1,7 +1,7 @@
 {
   "name": "blackout",
   "description": "A blank window you can place anywhere to help you focus on other tasks.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "type": "module",
   "scripts": {
     "tauri": "tauri"
