@@ -45,6 +45,7 @@
     </style>
     <script>
       const storageKey = 'blackoutColor';
+      const startupDelay = 500; // Time to wait before showing the window, to avoid the flash-bang.
 
       window.addEventListener('load', () => {
         const root = document.querySelector('html');
@@ -66,6 +67,10 @@
           input.style.left = event.clientX + 'px';
           window.setTimeout(input.click.bind(input), 5);
         });
+
+        // Show the window.
+        const currentWindow = window.__TAURI__.window.getCurrent();
+        window.setTimeout(currentWindow.show, startupDelay);
       });
 
       function changeColor (color) {

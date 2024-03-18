@@ -12,7 +12,10 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false
+      "all": false,
+      "window": {
+        "show": true
+      }
     },
     "bundle": {
       "active": true,
@@ -59,7 +62,8 @@
         "height": 300,
         "resizable": true,
         "title": "Blackout",
-        "width": 400
+        "width": 400,
+        "visible": false
       }
     ]
   }
