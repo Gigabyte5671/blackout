@@ -69,8 +69,8 @@
         });
 
         // Show the window.
-        const currentWindow = window.__TAURI__.window.getCurrent();
-        window.setTimeout(currentWindow.show, startupDelay);
+        const currentWindow = window.__TAURI__?.window?.getCurrent();
+        currentWindow && window.setTimeout(currentWindow.show, startupDelay);
       });
 
       function changeColor (color) {
