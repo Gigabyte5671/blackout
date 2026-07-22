@@ -7,9 +7,11 @@
     <title>Blackout</title>
     <style>
       html {
+        --color: black;
+        --gap: 0.5ch;
         height: 100%;
-        color: black;
-        background-color: black;
+        color: var(--color);
+        background-color: var(--color);
       }
       body {
         all: unset;
@@ -33,10 +35,54 @@
       body:hover span.prompt {
         opacity: 1;
       }
-      input[type="color"] {
+      #contextMenu {
         position: absolute;
         top: 0;
         left: 0;
+        display: flex;
+        flex-flow: column nowrap;
+        gap: calc(var(--gap) * 2);
+        padding: var(--gap);
+        background-color: #8884;
+        border: 1px solid #8882;
+        border-radius: calc(var(--gap) * 2);
+        opacity: 0;
+        user-select: none;
+        pointer-events: none;
+      }
+      button {
+        position: relative;
+        padding: 0.75ch 2.5ch;
+        color: inherit;
+        background-color: transparent;
+        border: unset;
+        border-radius: var(--gap);
+        filter: grayscale(1) invert(1) contrast(1000);
+        pointer-events: all;
+      }
+      button::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-color: currentColor;
+        border-radius: inherit;
+        opacity: 0;
+      }
+      button:hover::before {
+        opacity: 0.1;
+      }
+      hr {
+        width: 100%;
+        height: 0px;
+        margin: 0;
+        color: inherit;
+        border: unset;
+        border-bottom: 1px solid currentColor;
+        filter: grayscale(1) invert(1) contrast(1000);
+        opacity: 0.1;
+      }
+      input[type="color"] {
+        position: absolute;
         block-size: 0px;
         inline-size: 0px;
         opacity: 0;
@@ -46,26 +92,45 @@
     <script>
       const storageKey = 'blackoutColor';
       const startupDelay = 500; // Time to wait before showing the window, to avoid the flash-bang.
+      let isFullscreen = false;
+      let input;
+      let toggleFullscreenButton;
 
       window.addEventListener('load', () => {
         const root = document.querySelector('html');
-        const input = document.querySelector('input[type="color"]');
+        const contextMenu = document.getElementById('contextMenu');
+        input = document.querySelector('input[type="color"]');
+        toggleFullscreenButton = document.getElementById('toggleFullscreen');
 
         // Load the last selected color.
         const color = window.localStorage.getItem(storageKey);
-        if (color) {
+        if (color && input) {
           changeColor(color);
           input.value = color;
         }
 
-        // Open the color picker on right-click.
+        // Open the custom context menu on right-click.
         document.addEventListener('contextmenu', (event) => {
           event.preventDefault();
-          input.setAttribute('type', 'text');
-          input.setAttribute('type', 'color');
-          input.style.top = event.clientY + 'px';
-          input.style.left = event.clientX + 'px';
-          window.setTimeout(input.click.bind(input), 5);
+          closeColorPicker();
+          openContextMenu(event);
+        });
+
+        document.addEventListener('click', closeContextMenu);
+        window.addEventListener('blur', closeContextMenu);
+        window.addEventListener('keydown', ({ code }) => {
+          switch (code) {
+            case 'Escape':
+              closeContextMenu();
+              isFullscreen && toggleFullscreen();
+              break;
+            case 'F11':
+              closeContextMenu();
+              toggleFullscreen();
+              break;
+            default:
+              break;
+          }
         });
 
         // Show the window.
@@ -75,22 +140,58 @@
 
       function changeColor (color) {
         const root = document.querySelector('html');
-        root.style.color = color;
-        root.style.backgroundColor = color;
+        root.style.setProperty('--color', color);
+      }
+
+      function openContextMenu (event) {
+        if (event?.target?.tagName === 'INPUT') return;
+        contextMenu.style.top = event.clientY + 'px';
+        contextMenu.style.left = event.clientX + 'px';
+        contextMenu.style.opacity = '1';
+      }
+
+      function closeContextMenu (event) {
+        if (event?.target?.tagName === 'INPUT') return;
+        contextMenu.style.opacity = '0';
+      }
+
+      function openColorPicker () {
+        window.setTimeout(input?.click.bind(input), 5);
+      }
+
+      function closeColorPicker () {
+        input?.setAttribute('type', 'text');
+        input?.setAttribute('type', 'color');
       }
 
       function saveColor (color) {
         window.localStorage.setItem(storageKey, color);
       }
+
+      function toggleFullscreen () {
+        const currentWindow = window.__TAURI__?.window?.getCurrent();
+        if (currentWindow) {
+          isFullscreen = !isFullscreen;
+          void currentWindow.setFullscreen(isFullscreen);
+          if (toggleFullscreenButton) {
+            toggleFullscreenButton.innerText = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'
+          }
+        }
+      }
     </script>
   </head>
 
   <body>
-    <span class="prompt"><i>Right-click to change colour.</i></span>
-    <input
-      type="color"
-      oninput="changeColor(event.target.value)"
-      onchange="saveColor(event.target.value)"
-    >
+    <span class="prompt"><i>Right-click for options</i></span>
+    <div id="contextMenu">
+      <input
+        type="color"
+        oninput="changeColor(event.target.value)"
+        onchange="saveColor(event.target.value)"
+      >
+      <button id="toggleFullscreen" onclick="toggleFullscreen()">Fullscreen</button>
+      <hr>
+      <button onclick="openColorPicker()">Change Colour</button>
+    </div>
   </body>
 </html>
